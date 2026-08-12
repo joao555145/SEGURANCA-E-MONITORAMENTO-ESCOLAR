@@ -142,7 +142,7 @@ setTimeout(() => {
 
 setInterval(() => {
 
-fetch("http://192.168.0.111/valor")
+fetch("http://192.168.0.101/valor")
 
 .then(res => res.text())
 
@@ -163,3 +163,64 @@ new Date().toLocaleTimeString();
 
 
 },1000);
+
+// =========================
+// MONITORAMENTO PIR
+// =========================
+
+let ultimoMovimento = 0;
+
+function atualizarPIR() {
+
+  fetch("http://192.168.0.101/status")
+    .then(res => res.json())
+    .then(dados => {
+
+      // ESP ONLINE
+      document.getElementById("pirOnline").innerHTML = "Online";
+
+      // MOVIMENTO
+      if (dados.pir === 1) {
+
+        document.getElementById("pirMovimento").innerHTML =
+          "🚨 Movimento detectado";
+
+        // Atualiza somente quando o movimento começa
+        if (ultimoMovimento === 0) {
+
+          document.getElementById("pirHora").innerHTML =
+            new Date().toLocaleTimeString();
+
+        }
+
+        ultimoMovimento = 1;
+
+      } else {
+
+        document.getElementById("pirMovimento").innerHTML =
+          "✅ Ambiente normal";
+
+        ultimoMovimento = 0;
+      }
+
+    })
+
+    .catch(erro => {
+
+      document.getElementById("pirOnline").innerHTML =
+        "Offline";
+
+      document.getElementById("pirMovimento").innerHTML =
+        "Sem conexão";
+
+      console.log("Erro ao conectar com o PIR:", erro);
+
+    });
+}
+
+
+// Atualiza imediatamente
+atualizarPIR();
+
+// Atualiza a cada 1 segundo
+setInterval(atualizarPIR, 1000);
