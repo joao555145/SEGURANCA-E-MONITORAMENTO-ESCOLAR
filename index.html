@@ -53,13 +53,17 @@
       MQ-2
     </button>
 
+    <button class="botao" data-target="secaoGeral">
+    Monitoramento Geral
+    </button>
+
     <button class="botao" data-target="secao3">
       Alexcio AI
     </button>
 
     <button class="botao ativo" data-target="secao4">
-  Professores
-</button>
+     Professores
+    </button>
 
     <button class="botao ativo" data-target="secao5">
       Coisas Extras 
@@ -372,6 +376,84 @@ void loop() {
 </code></pre>
 
       </section>
+
+      <!-- MONITORAMENTO GERAL -->
+
+<section class="secao" id="secaoGeral">
+
+  <h2>MONITORAMENTO GERAL</h2>
+
+  <div class="monitor-geral">
+
+    <!-- PIR -->
+
+    <div class="sensor-geral">
+
+      <h3>🚨 SENSOR PIR</h3>
+
+      <div class="status-box">
+        <h4>STATUS DO SENSOR</h4>
+        <span id="geralPirOnline">
+          Online
+        </span>
+      </div>
+
+      <div class="status-box">
+        <h4>MOVIMENTO</h4>
+        <span id="geralPirMovimento">
+          Ambiente normal
+        </span>
+      </div>
+
+      <div class="status-box">
+        <h4>ÚLTIMO EVENTO</h4>
+        <span id="geralPirHora">
+          Nenhum movimento
+        </span>
+      </div>
+
+    </div>
+
+
+    <!-- MQ-2 -->
+
+    <div class="sensor-geral">
+
+      <h3>💨 SENSOR MQ-2</h3>
+
+      <div class="status-box">
+        <h4>STATUS DO SENSOR</h4>
+        <span id="geralMq2Online">
+          Online
+        </span>
+      </div>
+
+      <div class="status-box">
+        <h4>NÍVEL DE GÁS/FUMAÇA</h4>
+        <span id="geralMq2Valor">
+          0
+        </span>
+      </div>
+
+      <div class="status-box">
+        <h4>SITUAÇÃO</h4>
+        <span id="geralMq2Status">
+          Ambiente seguro
+        </span>
+      </div>
+
+      <div class="status-box">
+        <h4>ÚLTIMA LEITURA</h4>
+        <span id="geralMq2Hora">
+          Nenhuma leitura
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
       <!-- SEÇÃO 3 -->
 

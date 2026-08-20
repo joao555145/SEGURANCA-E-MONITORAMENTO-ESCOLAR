@@ -249,6 +249,94 @@ atualizarPIR();
 
 atualizarMQ2();
 
+// =========================
+// MONITORAMENTO GERAL
+// =========================
+
+function atualizarMonitoramentoGeral() {
+
+    // =========================
+    // PIR
+    // =========================
+
+    fetch("http://192.168.0.105/status")
+
+        .then(res => res.json())
+
+        .then(dados => {
+
+            document.getElementById("geralPirOnline").innerHTML =
+                "Online";
+
+
+            if (dados.pir === 1) {
+
+                document.getElementById("geralPirMovimento").innerHTML =
+                    "🚨 Movimento detectado";
+
+            } else {
+
+                document.getElementById("geralPirMovimento").innerHTML =
+                    "✅ Ambiente normal";
+
+            }
+
+        })
+
+        .catch(erro => {
+
+            document.getElementById("geralPirOnline").innerHTML =
+                "Offline";
+
+            document.getElementById("geralPirMovimento").innerHTML =
+                "Sem conexão";
+
+        });
+
+
+    // =========================
+    // MQ-2
+    // =========================
+
+    fetch("http://192.168.0.105/valor")
+
+        .then(res => res.text())
+
+        .then(dados => {
+
+            let partes = dados.split("|");
+
+
+            document.getElementById("geralMq2Online").innerHTML =
+                "Online";
+
+
+            document.getElementById("geralMq2Valor").innerHTML =
+                partes[0];
+
+
+            document.getElementById("geralMq2Status").innerHTML =
+                partes[1];
+
+
+            document.getElementById("geralMq2Hora").innerHTML =
+                new Date().toLocaleTimeString();
+
+        })
+
+        .catch(erro => {
+
+            document.getElementById("geralMq2Online").innerHTML =
+                "Offline";
+
+
+            document.getElementById("geralMq2Status").innerHTML =
+                "Sem conexão";
+
+        });
+
+}
+
 
 // =========================
 // ATUALIZAÇÃO A CADA 1 SEGUNDO
@@ -257,3 +345,7 @@ atualizarMQ2();
 setInterval(atualizarPIR, 1000);
 
 setInterval(atualizarMQ2, 1000);
+
+atualizarMonitoramentoGeral();
+
+setInterval(atualizarMonitoramentoGeral, 1000);
