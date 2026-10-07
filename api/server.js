@@ -201,8 +201,39 @@ app.get("/eventos", async (req, res) => {
 });
 
 // ==============================
+// APAGAR HISTÓRICO DE EVENTOS
+// ==============================
+
+app.delete("/eventos", async (req, res) => {
+
+    try {
+
+        await pool.query(
+            "DELETE FROM eventos"
+        );
+
+        res.json({
+            sucesso: true,
+            mensagem: "Histórico de eventos apagado com sucesso!"
+        });
+
+    } catch (erro) {
+
+        console.error("Erro ao apagar histórico:", erro);
+
+        res.status(500).json({
+            sucesso: false,
+            erro: "Não foi possível apagar o histórico de eventos."
+        });
+    }
+});
+
+// ==============================
 // RECEBER E SALVAR DADOS DO ESP8266
 // ==============================
+
+let ultimoEstadoPIR = false;
+let ultimoEstadoMQ2 = false;
 
 app.post("/esp/dados", async (req, res) => {
 
@@ -234,39 +265,52 @@ app.post("/esp/dados", async (req, res) => {
             [2, mq2]
         );
 
-        // ==============================
-        // EVENTO DE MOVIMENTO
-        // ==============================
+    // ==============================
+// EVENTO DE MOVIMENTO
+// ==============================
 
-        if (pir === 1) {
+const estadoAtualPIR = pir === 1;
 
-            await pool.query(
-                `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
-                 VALUES ($1, $2, $3)`,
-                [
-                    1,
-                    "MOVIMENTO",
-                    "Movimento detectado pelo PIR 01"
-                ]
-            );
-        }
+if (estadoAtualPIR && !ultimoEstadoPIR) {
 
-        // ==============================
-        // EVENTO DE FUMAÇA/GÁS
-        // ==============================
+    await pool.query(
+        `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
+         VALUES ($1, $2, $3)`,
+        [
+            1,
+            "MOVIMENTO",
+            "Movimento detectado pelo PIR 01"
+        ]
+    );
 
-        if (mq2 > 120) {
+    console.log("🚨 EVENTO: MOVIMENTO");
+}
 
-            await pool.query(
-                `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
-                 VALUES ($1, $2, $3)`,
-                [
-                    2,
-                    "FUMACA_GAS",
-                    "Fumaça ou gás detectado pelo MQ-2 01"
-                ]
-            );
-        }
+ultimoEstadoPIR = estadoAtualPIR;
+
+
+// ==============================
+// EVENTO DE FUMAÇA/GÁS
+// ==============================
+
+const estadoAtualMQ2 = mq2 > 120;
+
+if (estadoAtualMQ2 && !ultimoEstadoMQ2) {
+
+    await pool.query(
+        `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
+         VALUES ($1, $2, $3)`,
+        [
+            2,
+            "FUMACA_GAS",
+            "Fumaça ou gás detectado pelo MQ-2 01"
+        ]
+    );
+
+    console.log("🚨 EVENTO: FUMAÇA/GÁS");
+}
+
+ultimoEstadoMQ2 = estadoAtualMQ2;
 
         res.status(201).json({
             sucesso: true,
