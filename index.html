@@ -57,6 +57,10 @@
     Monitoramento Geral
     </button>
 
+    <button class="botao" data-target="secaoHistorico">
+    Histórico de Eventos
+    </button>
+
     <button class="botao" data-target="secao3">
       Alexcio AI
     </button>
@@ -130,44 +134,8 @@
           Bom, é mais fácil na prática! O código está aí, agora é só testar!
         </p>
 
-        <!-- MONITORAMENTO PIR -->
 
-<div class="monitor-pir">
-
-    <h3>
-         MONITORAMENTO EM TEMPO REAL
-    </h3>
-
-    <div class="pir-status">
-
-        <div class="status-box">
-            <h4>STATUS DO SENSOR</h4>
-            <span id="pirOnline">
-                 Online
-            </span>
-        </div>
-
-
-        <div class="status-box">
-            <h4>MOVIMENTO</h4>
-            <span id="pirMovimento">
-               Ambiente normal
-            </span>
-        </div>
-
-
-        <div class="status-box">
-            <h4>ÚLTIMO EVENTO</h4>
-            <span id="pirHora">
-                Nenhum movimento
-            </span>
-        </div>
-
-    </div>
-
-</div>
-
-<pre class="codigo"><code>
+        <pre class="codigo"><code>
 #define SENSOR_PIR 2
 #define LED 3
 void setup() {
@@ -264,48 +232,8 @@ while True:
         </p>
 
   <div class="monitor-mq2">
-
-<h3>
-    MONITORAMENTO MQ-2 EM TEMPO REAL
-</h3>
-
-<div class="mq2-status">
-
-    <div class="status-box">
-        <h4>STATUS DO SENSOR</h4>
-        <span id="mq2Online">
-            Online
-        </span>
-    </div>
-
-
-    <div class="status-box">
-        <h4>NÍVEL DE GÁS/FUMAÇA</h4>
-        <span id="mq2Valor">
-            0 ppm
-        </span>
-    </div>
-
-
-    <div class="status-box">
-        <h4>SITUAÇÃO DO AMBIENTE</h4>
-        <span id="mq2Status">
-            Ambiente seguro
-        </span>
-    </div>
-
-
-    <div class="status-box">
-        <h4>ÚLTIMA LEITURA</h4>
-        <span id="mq2Hora">
-            Nenhuma leitura
-        </span>
-    </div>
-
-</div>
-
-</div>
-<pre class="codigo"><code>
+ 
+    <pre class="codigo"><code>
 #define MQ_analogico A0
 #define MQ_digital 4
 #define Buzzer 5
@@ -448,6 +376,62 @@ void loop() {
           Nenhuma leitura
         </span>
       </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<section class="secao" id="secaoHistorico">
+
+  <h2>HISTÓRICO DE EVENTOS</h2>
+
+  <div class="historico-eventos">
+
+    <!-- BOTÃO PARA APAGAR HISTÓRICO -->
+
+    <div class="acoes-historico">
+
+      <div class="filtros-eventos">
+
+    <button class="filtro-evento ativo" data-filtro="todos">
+        ALL
+    </button>
+
+    <button class="filtro-evento" data-filtro="pir">
+        PIR
+    </button>
+
+    <button class="filtro-evento" data-filtro="mq2">
+        MQ2
+    </button>
+
+</div>
+
+
+      <button id="btnApagarHistorico" class="btn-apagar-historico">
+        🗑️ Apagar histórico
+      </button>
+
+    </div>
+
+
+    <!-- TABELA DE EVENTOS -->
+
+    <div class="tabela-eventos">
+
+      <div class="cabecalho-eventos">
+        <span>ID</span>
+        <span>SENSOR</span>
+        <span>TIPO</span>
+        <span>DESCRIÇÃO</span>
+        <span>DATA/HORA</span>
+      </div>
+
+      <div id="listaEventos"></div>
 
     </div>
 

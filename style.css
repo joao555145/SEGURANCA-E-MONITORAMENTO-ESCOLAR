@@ -127,9 +127,9 @@
   .sidebar .botao,
   .sidebar .logoutBtn{
     width:100%;
-    padding:14px;
+    padding:10px;
     border:none;
-    border-radius:14px;
+    border-radius:10px;
     background:rgba(255,255,255,0.08);
     color:white;
     font-size:15px;
@@ -1198,7 +1198,7 @@ body.dark .sensor-geral{
  ========================================= */
 
  #ia-area {
-    height: 500px;
+    height: 400px;
     overflow-y: auto;
 
     padding: 25px 35px;
@@ -1704,4 +1704,231 @@ body.dark .tabela-ia th {
 
 body.dark .tabela-ia td {
     border-bottom: 1px solid #444;
+}
+
+/* =========================================
+   HISTÓRICO DE EVENTOS
+========================================= */
+
+.historico-eventos {
+  background: #454648;
+  padding: 25px;
+  border-radius: 15px;
+  margin: 30px 0;
+  overflow: hidden;
+}
+
+.tabela-eventos {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* CABEÇALHO */
+
+.cabecalho-eventos {
+  display: grid;
+  grid-template-columns: 70px 140px 150px 1fr 180px;
+  gap: 0;
+  min-width: 850px;
+
+  background: #3b3c3e;
+  color: white;
+
+  padding: 15px;
+
+  font-weight: 700;
+  font-size: 14px;
+
+  border-radius: 10px 10px 0 0;
+}
+
+/* LISTA */
+
+#listaEventos {
+  min-width: 850px;
+}
+
+/* CADA EVENTO */
+
+.evento-linha {
+  display: grid;
+  grid-template-columns: 70px 140px 150px 1fr 180px;
+  align-items: center;
+
+  padding: 15px;
+
+  background: #b1b3b7c6;
+  color: #111;
+
+  border-bottom: 1px solid #8f9195;
+
+  font-size: 14px;
+}
+
+/* EFEITO AO PASSAR O MOUSE */
+
+.evento-linha:hover {
+  background: #c4c6c9;
+}
+
+/* TIPOS DE EVENTO */
+
+.evento-tipo {
+  font-weight: 700;
+}
+
+.evento-movimento {
+  color: #b91c1c;
+}
+
+.evento-gas {
+  color: #92400e;
+}
+
+/* DESCRIÇÃO */
+
+.evento-descricao {
+  padding-right: 15px;
+}
+
+/* DATA */
+
+.evento-data {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* MENSAGEM SEM EVENTOS */
+
+.sem-eventos {
+  background: #b1b3b7c6;
+  color: #222;
+  padding: 25px;
+  text-align: center;
+  border-radius: 0 0 10px 10px;
+}
+
+/* DARK MODE */
+
+body.dark .historico-eventos {
+  background: #454648;
+}
+
+body.dark .cabecalho-eventos {
+  background: #242424;
+}
+
+body.dark .evento-linha {
+  background: #3b3c3e;
+  color: #f1f1f1;
+  border-bottom: 1px solid #555;
+}
+
+body.dark .evento-linha:hover {
+  background: #48494b;
+}
+
+body.dark .evento-movimento {
+  color: #f87171;
+}
+
+body.dark .evento-gas {
+  color: #fbbf24;
+}
+
+body.dark .sem-eventos {
+  background: #3b3c3e;
+  color: #f1f1f1;
+}
+
+/* =========================================
+   HISTÓRICO NO CELULAR
+========================================= */
+
+@media(max-width:800px){
+
+  .historico-eventos {
+    padding: 15px;
+  }
+
+  .cabecalho-eventos,
+  .evento-linha {
+    grid-template-columns:
+      60px
+      120px
+      140px
+      300px
+      170px;
+  }
+
+}
+
+/* =========================
+   BOTÃO APAGAR HISTÓRICO
+========================= */
+
+.acoes-historico {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.btn-apagar-historico {
+    background: #b3261e;
+    color: white;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 5px;
+    font-family: Poppins, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-apagar-historico:hover {
+    background: #8f1d18;
+}
+
+.btn-apagar-historico:active {
+    transform: scale(0.97);
+}
+
+/* =========================
+   FILTROS DO HISTÓRICO
+========================= */
+
+.filtros-eventos {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+    margin-right: 25px;
+}
+
+.filtro-evento {
+    background: #2b2b2b;
+    color: #ffffff;
+    border: 1px solid #555;
+    padding: 5px 5px;
+    border-radius: 5px;
+    font-family: Poppins, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.filtro-evento:hover {
+    background: #3a3a3a;
+}
+
+.filtro-evento.ativo {
+    background: #ffffff;
+    color: #1f1f1f;
+    border-color: #ffffff;
+    font-weight: 600;
+}
+
+.filtro-evento:active {
+    transform: scale(0.97);
 }

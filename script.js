@@ -56,7 +56,9 @@ botoes.forEach((botao) => {
     // FECHA MENU
     sidebar.classList.remove("abrir");
 
-    overlay.classList.remove("ativo");
+     if (overlay) {
+      overlay.classList.remove("ativo");
+    }
 
   });
 
@@ -141,211 +143,356 @@ setTimeout(() => {
 
 
 // =========================
-// MONITORAMENTO PIR
-// =========================
-
-let ultimoMovimento = 0;
-
-function atualizarPIR() {
-
-    fetch("http://192.168.0.101/status")
-        .then(res => res.json())
-        .then(dados => {
-
-            document.getElementById("pirOnline").innerHTML =
-                "Online";
-
-            if (dados.pir === 1) {
-
-                document.getElementById("pirMovimento").innerHTML =
-                    "🚨 Movimento detectado";
-
-                // Só registra o horário quando o movimento começa
-                if (ultimoMovimento === 0) {
-
-                    document.getElementById("pirHora").innerHTML =
-                        new Date().toLocaleTimeString();
-
-                }
-
-                ultimoMovimento = 1;
-
-            } else {
-
-                document.getElementById("pirMovimento").innerHTML =
-                    "✅ Ambiente normal";
-
-                // NÃO altera pirHora
-                // Assim permanece o último evento
-
-                ultimoMovimento = 0;
-            }
-
-        })
-        .catch(erro => {
-
-            document.getElementById("pirOnline").innerHTML =
-                "Offline";
-
-            document.getElementById("pirMovimento").innerHTML =
-                "Sem conexão";
-
-            console.log(
-                "Erro ao conectar com o PIR:",
-                erro
-            );
-
-        });
-}
-
-
-// =========================
-// MONITORAMENTO MQ-2
-// =========================
-
-function atualizarMQ2() {
-
-    fetch("http://192.168.0.101/valor")
-        .then(res => res.text())
-        .then(dados => {
-
-            let partes = dados.split("|");
-
-            document.getElementById("mq2Online").innerHTML =
-                "Online";
-
-            document.getElementById("mq2Valor").innerHTML =
-                partes[0];
-
-            document.getElementById("mq2Status").innerHTML =
-                partes[1];
-
-            document.getElementById("mq2Hora").innerHTML =
-                new Date().toLocaleTimeString();
-
-        })
-        .catch(erro => {
-
-            document.getElementById("mq2Online").innerHTML =
-                "Offline";
-
-            document.getElementById("mq2Status").innerHTML =
-                "Sem conexão";
-
-            console.log(
-                "Erro ao conectar com o MQ-2:",
-                erro
-            );
-
-        });
-}
-
-
-// =========================
-// ATUALIZAÇÃO INICIAL
-// =========================
-
-atualizarPIR();
-
-atualizarMQ2();
-
-// =========================
 // MONITORAMENTO GERAL
 // =========================
 
-function atualizarMonitoramentoGeral() {
+async function atualizarMonitoramentoGeral() {
 
-    // =========================
-    // PIR
-    // =========================
+    try {
 
-    fetch("http://192.168.0.105/status")
+        const resposta = await fetch(
+            "http://10.237.216.158:3000/leituras"
+        );
 
-        .then(res => res.json())
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar leituras");
+        }
 
-        .then(dados => {
+        const leituras = await resposta.json();
+        console.log("PRIMEIRA LEITURA:", leituras[0]);
+        console.log("ÚLTIMA LEITURA:", leituras[leituras.length - 1]);
 
-            document.getElementById("geralPirOnline").innerHTML =
+        console.log("LEITURAS DO MONITORAMENTO:", leituras);
+
+
+        // =========================
+        // PEGA A ÚLTIMA LEITURA DO PIR
+        // =========================
+
+        const leiturasPIR = leituras.filter(
+            leitura => Number(leitura.sensor_id) === 1
+        );
+
+        if (leiturasPIR.length > 0) {
+
+            const pir = leiturasPIR[0];
+
+            document.getElementById("geralPirOnline").textContent =
                 "Online";
 
+            if (pir.movimento === true) {
 
-            if (dados.pir === 1) {
-
-                document.getElementById("geralPirMovimento").innerHTML =
+                document.getElementById("geralPirMovimento").textContent =
                     "🚨 Movimento detectado";
 
             } else {
 
-                document.getElementById("geralPirMovimento").innerHTML =
+                document.getElementById("geralPirMovimento").textContent =
                     "✅ Ambiente normal";
-
             }
 
-        })
+            document.getElementById("geralPirHora").textContent =
+                new Date(pir.data_hora).toLocaleTimeString();
 
-        .catch(erro => {
-
-            document.getElementById("geralPirOnline").innerHTML =
-                "Offline";
-
-            document.getElementById("geralPirMovimento").innerHTML =
-                "Sem conexão";
-
-        });
+        }
 
 
-    // =========================
-    // MQ-2
-    // =========================
+        // =========================
+        // PEGA A ÚLTIMA LEITURA DO MQ-2
+        // =========================
 
-    fetch("http://192.168.0.105/valor")
+        const leiturasMQ2 = leituras.filter(
+            leitura => Number(leitura.sensor_id) === 2
+        );
 
-        .then(res => res.text())
+        if (leiturasMQ2.length > 0) {
 
-        .then(dados => {
+            const mq2 = leiturasMQ2[0];
 
-            let partes = dados.split("|");
-
-
-            document.getElementById("geralMq2Online").innerHTML =
+            document.getElementById("geralMq2Online").textContent =
                 "Online";
 
+            document.getElementById("geralMq2Valor").textContent =
+                mq2.valor;
 
-            document.getElementById("geralMq2Valor").innerHTML =
-                partes[0];
+            const valor = Number(mq2.valor);
 
+            if (valor > 120) {
 
-            document.getElementById("geralMq2Status").innerHTML =
-                partes[1];
+                document.getElementById("geralMq2Status").textContent =
+                    "⚠️ Fumaça ou gás detectado";
 
+            } else {
 
-            document.getElementById("geralMq2Hora").innerHTML =
-                new Date().toLocaleTimeString();
+                document.getElementById("geralMq2Status").textContent =
+                    "✅ Ambiente seguro";
+            }
 
-        })
+            document.getElementById("geralMq2Hora").textContent =
+                new Date(mq2.data_hora).toLocaleTimeString();
 
-        .catch(erro => {
+        }
 
-            document.getElementById("geralMq2Online").innerHTML =
-                "Offline";
+    } catch (erro) {
 
+        console.error(
+            "Erro no Monitoramento Geral:",
+            erro
+        );
 
-            document.getElementById("geralMq2Status").innerHTML =
-                "Sem conexão";
+    }
+}
 
-        });
+console.log("TESTE: chamando Monitoramento Geral");
+
+atualizarMonitoramentoGeral();
+
+setInterval(() => {
+    console.log("TESTE: atualizando Monitoramento Geral");
+    atualizarMonitoramentoGeral();
+}, 1000);
+
+// =========================
+// HISTÓRICO DE EVENTOS
+// =========================
+
+async function atualizarHistoricoEventos() {
+
+    try {
+
+        const resposta = await fetch(
+            "http://10.237.216.158:3000/eventos"
+        );
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar eventos");
+        }
+
+        const eventos = await resposta.json();
+
+        console.log("EVENTOS RECEBIDOS:", eventos);
+
+        const listaEventos =
+            document.getElementById("listaEventos");
+
+        if (!listaEventos) {
+            console.error("ERRO: #listaEventos não encontrado");
+            return;
+        }
+
+        listaEventos.innerHTML = "";
+
+        if (eventos.length === 0) {
+
+            listaEventos.innerHTML = `
+                <div class="sem-eventos">
+                    Nenhum evento registrado.
+                </div>
+            `;
+
+            return;
+        }
+
+        eventos.forEach((evento) => {
+
+            let sensor = "Desconhecido";
+
+            if (Number(evento.sensor_id) === 1) {
+                sensor = "PIR 01";
+            }
+
+            if (Number(evento.sensor_id) === 2) {
+                sensor = "MQ-2 01";
+            }
+
+            let tipoClasse = "";
+
+            if (evento.tipo_evento === "MOVIMENTO") {
+                tipoClasse = "evento-movimento";
+            }
+
+            if (evento.tipo_evento === "FUMACA_GAS") {
+                tipoClasse = "evento-gas";
+            }
+
+            const dataHora =
+                new Date(evento.data_hora)
+                    .toLocaleString("pt-BR");
+
+            const linha = document.createElement("div");
+
+            linha.className = "evento-linha";
+
+            linha.innerHTML = `
+                <span>${evento.id}</span>
+                <span>${sensor}</span>
+                <span class="evento-tipo ${tipoClasse}">
+                    ${evento.tipo_evento}
+                </span>
+                <span class="evento-descricao">
+                    ${evento.descricao}
+                </span>
+                <span class="evento-data">
+                    ${dataHora}
+                </span>
+            `;
+
+           listaEventos.appendChild(linha);
+
+if (filtroHistoricoAtual === "pir") {
+    linha.style.display =
+        evento.tipo_evento === "MOVIMENTO"
+            ? "grid"
+            : "none";
+}
+
+if (filtroHistoricoAtual === "mq2") {
+    linha.style.display =
+        evento.tipo_evento === "FUMACA_GAS"
+            ? "grid"
+            : "none";
+}
+
+});
+
+    } catch (erro) {
+
+        console.error(
+            "ERRO NO HISTÓRICO:",
+            erro
+        );
+
+    }
 
 }
 
 
 // =========================
-// ATUALIZAÇÃO A CADA 1 SEGUNDO
+// ATUALIZA HISTÓRICO
 // =========================
 
-setInterval(atualizarPIR, 1000);
+atualizarHistoricoEventos();
 
-setInterval(atualizarMQ2, 1000);
+setInterval(() => {
 
-atualizarMonitoramentoGeral();
+    atualizarHistoricoEventos();
 
-setInterval(atualizarMonitoramentoGeral, 1000);
+}, 3000);
+
+// =========================
+// APAGAR HISTÓRICO DE EVENTOS
+// =========================
+
+const btnApagarHistorico =
+    document.getElementById("btnApagarHistorico");
+
+if (btnApagarHistorico) {
+
+    btnApagarHistorico.addEventListener(
+        "click",
+        async () => {
+
+            const confirmar = confirm(
+                "Tem certeza que deseja apagar todo o histórico de eventos?"
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+            try {
+
+                const resposta = await fetch(
+                    "http://10.237.216.158:3000/eventos",
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+                if (!resposta.ok) {
+                    throw new Error("Erro ao apagar histórico");
+                }
+
+                const resultado = await resposta.json();
+
+                console.log(
+                    "HISTÓRICO APAGADO:",
+                    resultado
+                );
+
+                alert(
+                    "Histórico de eventos apagado com sucesso!"
+                );
+
+                atualizarHistoricoEventos();
+
+            } catch (erro) {
+
+                console.error(
+                    "ERRO AO APAGAR HISTÓRICO:",
+                    erro
+                );
+
+                alert(
+                    "Não foi possível apagar o histórico de eventos."
+                );
+
+            }
+
+        }
+    );
+
+}
+
+// =========================
+// FILTRO DO HISTÓRICO
+// =========================
+
+
+let filtroHistoricoAtual = "todos";
+const botoesFiltro = document.querySelectorAll(".filtro-evento");
+
+botoesFiltro.forEach((botao) => {
+
+    botao.addEventListener("click", () => {
+
+        const filtro = botao.dataset.filtro;
+        filtroHistoricoAtual = filtro;
+
+        botoesFiltro.forEach((b) => {
+            b.classList.remove("ativo");
+        });
+
+        botao.classList.add("ativo");
+
+        const linhas = document.querySelectorAll(".evento-linha");
+
+        linhas.forEach((linha) => {
+
+            const tipo = linha.querySelector(".evento-tipo");
+
+            if (!tipo) return;
+
+            if (filtro === "todos") {
+                linha.style.display = "grid";
+            }
+
+            if (filtro === "pir") {
+                linha.style.display =
+                    tipo.textContent.trim() === "MOVIMENTO"
+                        ? "grid"
+                        : "none";
+            }
+
+            if (filtro === "mq2") {
+                linha.style.display =
+                    tipo.textContent.trim() === "FUMACA_GAS"
+                        ? "grid"
+                        : "none";
+            }
+
+        });
+
+    });
+
+});
