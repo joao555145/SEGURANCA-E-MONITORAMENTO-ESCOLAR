@@ -153,6 +153,9 @@ app.post("/eventos", async (req, res) => {
     try {
 
         const { sensor_id, tipo_evento, descricao } = req.body;
+        console.log("DADOS RECEBIDOS EM POST /eventos:", req.body);
+        console.log("ORIGEM:", req.headers.referer);
+        console.log("CONTENT-TYPE:", req.headers["content-type"]);
 
         const resultado = await pool.query(
             `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
@@ -235,111 +238,111 @@ app.delete("/eventos", async (req, res) => {
 let ultimoEstadoPIR = false;
 let ultimoEstadoMQ2 = false;
 
-app.post("/esp/dados", async (req, res) => {
+    app.post("/esp/dados", async (req, res) => {
 
-    try {
+        try {
 
-        const { pir, mq2 } = req.body;
+            const { pir, mq2 } = req.body;
 
-        console.log("Dados recebidos do ESP8266:");
-        console.log("PIR:", pir);
-        console.log("MQ-2:", mq2);
+            console.log("Dados recebidos do ESP8266:");
+            console.log("PIR:", pir);
+            console.log("MQ-2:", mq2);
+
+            // ==============================
+            // SALVAR LEITURA DO PIR
+            // ==============================
+
+            await pool.query(
+                `INSERT INTO leituras (sensor_id, movimento)
+                VALUES ($1, $2)`,
+                [1, pir === 1]
+            );
+
+            // ==============================
+            // SALVAR LEITURA DO MQ-2
+            // ==============================
+
+            await pool.query(
+                `INSERT INTO leituras (sensor_id, valor)
+                VALUES ($1, $2)`,
+                [2, mq2]
+            );
 
         // ==============================
-        // SALVAR LEITURA DO PIR
-        // ==============================
+    // EVENTO DE MOVIMENTO
+    // ==============================
+
+    const estadoAtualPIR = pir === 1;
+
+    if (estadoAtualPIR && !ultimoEstadoPIR) {
 
         await pool.query(
-            `INSERT INTO leituras (sensor_id, movimento)
-             VALUES ($1, $2)`,
-            [1, pir === 1]
+            `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
+            VALUES ($1, $2, $3)`,
+            [
+                1,
+                "MOVIMENTO",
+                "Movimento detectado pelo PIR 01"
+            ]
         );
 
-        // ==============================
-        // SALVAR LEITURA DO MQ-2
-        // ==============================
+        console.log("🚨 EVENTO: MOVIMENTO");
+    }
 
-        await pool.query(
-            `INSERT INTO leituras (sensor_id, valor)
-             VALUES ($1, $2)`,
-            [2, mq2]
-        );
+    ultimoEstadoPIR = estadoAtualPIR;
+
 
     // ==============================
-// EVENTO DE MOVIMENTO
-// ==============================
+    // EVENTO DE FUMAÇA/GÁS
+    // ==============================
 
-const estadoAtualPIR = pir === 1;
+    const estadoAtualMQ2 = mq2 > 120;
 
-if (estadoAtualPIR && !ultimoEstadoPIR) {
+    if (estadoAtualMQ2 && !ultimoEstadoMQ2) {
 
-    await pool.query(
-        `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
-         VALUES ($1, $2, $3)`,
-        [
-            1,
-            "MOVIMENTO",
-            "Movimento detectado pelo PIR 01"
-        ]
-    );
+        await pool.query(
+            `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
+            VALUES ($1, $2, $3)`,
+            [
+                2,
+                "FUMACA_GAS",
+                "Fumaça ou gás detectado pelo MQ-2 01"
+            ]
+        );
 
-    console.log("🚨 EVENTO: MOVIMENTO");
-}
-
-ultimoEstadoPIR = estadoAtualPIR;
-
-
-// ==============================
-// EVENTO DE FUMAÇA/GÁS
-// ==============================
-
-const estadoAtualMQ2 = mq2 > 120;
-
-if (estadoAtualMQ2 && !ultimoEstadoMQ2) {
-
-    await pool.query(
-        `INSERT INTO eventos (sensor_id, tipo_evento, descricao)
-         VALUES ($1, $2, $3)`,
-        [
-            2,
-            "FUMACA_GAS",
-            "Fumaça ou gás detectado pelo MQ-2 01"
-        ]
-    );
-
-    console.log("🚨 EVENTO: FUMAÇA/GÁS");
-}
-
-ultimoEstadoMQ2 = estadoAtualMQ2;
-
-        res.status(201).json({
-            sucesso: true,
-            mensagem: "Dados do ESP8266 recebidos e salvos!",
-            dados: {
-                pir: pir,
-                mq2: mq2
-            }
-        });
-
-    } catch (erro) {
-
-        console.error("Erro ao receber dados do ESP:", erro);
-
-        res.status(500).json({
-            sucesso: false,
-            erro: "Erro ao receber e salvar os dados do ESP8266."
-        });
+        console.log("🚨 EVENTO: FUMAÇA/GÁS");
     }
-});
 
-// ==============================
-// INICIAR SERVIDOR
-// ==============================
+    ultimoEstadoMQ2 = estadoAtualMQ2;
 
-app.listen(PORT, () => {
+            res.status(201).json({
+                sucesso: true,
+                mensagem: "Dados do ESP8266 recebidos e salvos!",
+                dados: {
+                    pir: pir,
+                    mq2: mq2
+                }
+            });
 
-    console.log("==============================");
-    console.log(" API SEGURANÇA ESCOLAR");
-    console.log("==============================");
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+        } catch (erro) {
+
+            console.error("Erro ao receber dados do ESP:", erro);
+
+            res.status(500).json({
+                sucesso: false,
+                erro: "Erro ao receber e salvar os dados do ESP8266."
+            });
+        }
+    });
+
+    // ==============================
+    // INICIAR SERVIDOR
+    // ==============================
+
+    app.listen(PORT, () => {
+
+        console.log("==============================");
+        console.log(" API SEGURANÇA ESCOLAR");
+        console.log("==============================");
+        console.log(`Servidor rodando em http://localhost:${PORT}`);
+    });
