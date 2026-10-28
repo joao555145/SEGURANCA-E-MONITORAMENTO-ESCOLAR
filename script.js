@@ -151,7 +151,7 @@ async function atualizarMonitoramentoGeral() {
     try {
 
         const resposta = await fetch(
-            "http://10.237.216.158:3000/leituras"
+           "http://192.168.0.106:3000/leituras"
         );
 
         if (!resposta.ok) {
@@ -217,7 +217,7 @@ async function atualizarMonitoramentoGeral() {
 
             const valor = Number(mq2.valor);
 
-            if (valor > 120) {
+            if (valor > 51) {
 
                 document.getElementById("geralMq2Status").textContent =
                     "⚠️ Fumaça ou gás detectado";
@@ -261,7 +261,7 @@ async function atualizarHistoricoEventos() {
     try {
 
         const resposta = await fetch(
-            "http://10.237.216.158:3000/eventos"
+            "http://192.168.0.106:3000/leituras"
         );
 
         if (!resposta.ok) {
@@ -403,7 +403,8 @@ if (btnApagarHistorico) {
             try {
 
                 const resposta = await fetch(
-                    "http://10.237.216.158:3000/eventos",
+                   "http://192.168.0.106:3000/leituras",
+    
                     {
                         method: "DELETE"
                     }
