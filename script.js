@@ -217,7 +217,7 @@ async function atualizarMonitoramentoGeral() {
 
             const valor = Number(mq2.valor);
 
-            if (valor > 51) {
+            if (valor > 50) {
 
                 document.getElementById("geralMq2Status").textContent =
                     "⚠️ Fumaça ou gás detectado";
