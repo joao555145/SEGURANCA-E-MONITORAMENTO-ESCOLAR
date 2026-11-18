@@ -1,4 +1,4 @@
-import type { ChatMessage, DashboardSnapshot, SecurityEvent, Sensor } from '../types';
+import type { ChatMessage, DashboardSnapshot, SecurityEvent } from '../types';
 
 const pause = (milliseconds = 220) =>
   new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
@@ -8,36 +8,7 @@ const minutesAgo = (minutes: number) =>
 
 // Cenário didático baseado nos dois sensores usados pelo simulador do JazzSecurity.
 // A telemetria real nunca é substituída por estes registros.
-const mockSensors: Sensor[] = [
-  {
-    id: 'PIR_01',
-    code: 'PIR_01',
-    type: 'PIR',
-    locationId: 'CORREDOR',
-    name: 'PIR 01',
-    description: 'Detecção de movimento por infravermelho passivo',
-    value: 'Movimento detectado',
-    detail: 'Estado ilustrativo para demonstração',
-    status: 'warning',
-    icon: 'presence',
-    location: 'Corredor',
-    lastReading: 'Dado simulado',
-  },
-  {
-    id: 'MQ2_01',
-    code: 'MQ2_01',
-    type: 'MQ-2',
-    locationId: 'WC_MASC',
-    name: 'MQ-2 01',
-    description: 'Leitura analógica de fumaça/gás',
-    value: '74',
-    detail: 'Valor ilustrativo; unidade não calibrada',
-    status: 'normal',
-    icon: 'smoke',
-    location: 'Banheiro masculino',
-    lastReading: 'Dado simulado',
-  },
-];
+
 
 const mockEvents: SecurityEvent[] = [
   {
@@ -89,7 +60,7 @@ const mockEvents: SecurityEvent[] = [
 export async function getMockDashboardSnapshot(): Promise<DashboardSnapshot> {
   await pause();
   return {
-    sensors: mockSensors.map((sensor) => ({ ...sensor })),
+    sensors: [],
     events: mockEvents.map((event) => ({ ...event })),
     generatedAt: new Date().toISOString(),
     source: 'mock',
